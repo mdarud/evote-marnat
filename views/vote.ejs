@@ -1,38 +1,121 @@
-<body id="voting-page">
-<form action = "/users/voting" method = "POST">
-    <div class="container-fluid">
-        <% include ./partials/messages %>
-        <div class="row justify-content-center">
-            <label id="label1">
-                <input type="radio" name="product" class="card-input-element" value = "Fanniaty Putri"/>
-                <div class="card1 card-input" style="width:290px;height:530px;">
-                <div class="card2 card-input" align="center" style="width:260px;height:420px;">
-                    <img class="card-img-top" src="/images/calon1.png" alt="Card image">
-                    <div class="card-body">
-                        <h4 align="center" class="card-title">Fanniaty Putri</h4>
-                        <h1 align="center" class="card-text1">No. 1</h1>
-                    </div>
-                </div>
-                </div>
-            </label>
-
-            <div id="outer">
-                <button class="btn butt" type="submit" id="inner">Submit</button>
+<body style="background-color: #181818;">
+    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="images/Logo Univ.png" height="104" width="332" alt="Universitas Kristen Maranatha">
+        </a>
+        <button class="navbar-toggler" type="button" data-trigger="#main_nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse" id="main_nav">
+            <div id="closer"></div>
+            <div class="offcanvas-header mt-3">  
             </div>
-        
-            <label id="label1">
-                <input type="radio" name="product" class="card-input-element" />
-                <div class="card1 card-input" style="width:290px;height:530px;">
-                <div class="card2 card-input" align="center" style="width:260px;height:420px;">
-                    <img class="card-img-top" src="/images/calon2.png" alt="Card image" value = "Nopia Indrianingsih Simangungsong">
+            <ul class="navbar-nav ml-auto">
+            <li class="nav-item bordered"> <p class="nav-acc"> Selamat memilih, <%= name %>! </p> </li>
+            <li class="nav-item"> <a class="nav-link" onclick="return theFunction();" href="/users/logout"> Logout </a> </li>
+            </ul>
+        </div> <!-- navbar-collapse.// -->
+    </nav>
+
+    <div class="container-fluid" style="margin-top: 20px;margin-bottom: 20px;">
+        <div class="row" style="padding: 5px;">
+            <div class="col-md-4 d-none">
+                <div class="card bg-light mb-3 mapeka" data-toggle="modal" data-target="#mapeka">
+                    <div class="card-header">MAPEKA</div>
                     <div class="card-body">
-                        <h5 align="center" class="card-title">Nopia Indrianingsih Simangunsong</h5>
-                        <h1 align="center" class="card-text2">No. 2</h1>
+                        <h5 class="card-title">Mahasiswa Pecinta Kelestarian Alam</h5>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-light mb-3 ukor" data-toggle="modal" data-target="#ukor">
+                    <div class="card-header">UKOR</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Unit Kegiatan Olahraga</h5>
+                    </div>
                 </div>
-            </label>
+            </div>
+            <div class="col-md-4 d-none">
+                <div class="card bg-light mb-3 vom" data-toggle="modal" data-target="#vom">
+                    <div class="card-header">VOM</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Voice of Maranatha</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="padding: 5px;">
+            <div class="col-md-4 d-none">
+                <div class="card bg-light mb-3 menwa" data-toggle="modal" data-target="#menwa">
+                    <div class="card-header">MENWA</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Resimen Mahasiswa</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-none">
+                <div class="card bg-light mb-3 mcuc" data-toggle="modal" data-target="#mcuc">
+                    <div class="card-header">MCUC</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Maranatha Christian University Choir</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-none">
+                <div class="card bg-light mb-3 bela" data-toggle="modal" data-target="#bela">
+                    <div class="card-header">Bela Diri</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Bela Diri</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="padding: 5px;">
+            <div class="col-md-4 d-none">
+                <div class="card bg-light mb-3 teto" data-toggle="modal" data-target="#teto">
+                    <div class="card-header">TeTo</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Teater Topeng</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-none">
+                <div class="card bg-light mb-3 seni" data-toggle="modal" data-target="#uks">
+                    <div class="card-header">UK Seni</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Unit Kegiatan Seni</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-none">
+                <div class="card bg-light mb-3 maphac" data-toggle="modal" data-target="#maphac">
+                    <div class="card-header">MAPHAC</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Maranatha Photography Club</h5>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</form>
+
+    <% include ./partials/popup %>
+    <form action="/users/voting" method="POST">
+        <input class="d-none" type="text" name="MAPEKA" id="1">
+        <input class="d-none" type="text" name="UKOR" id="2">
+        <input class="d-none" type="text" name="VOM" id="3">
+        <input class="d-none" type="text" name="MENWA" id="4">
+        <input class="d-none" type="text" name="MCUC" id="5">
+        <input class="d-none" type="text" name="Bela" id="6">
+        <input class="d-none" type="text" name="Teto" id="7">
+        <input class="d-none" type="text" name="UKS" id="8">
+        <input class="d-none" type="text" name="MAPHAC" id="9">
+        <div class="container-fluid" style="margin-bottom: 20px; margin-top: 20px;">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary" id="send" style="width: 100%;">Submit</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    
 </body>

@@ -1,25 +1,25 @@
 const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcryptjs');
+//const bcrypt = require('bcryptjs');
 
 // Load User model
-const User = require('../models/User');
+const User = require('../models/Users');
 
 module.exports = function(passport) {
   passport.use(
     new LocalStrategy({ 
-      usernameField : 'name',
+      usernameField : 'email',
       passwordField : 'token',
       passReqToCallback : true 
     }, (req, email, password, done) => {
       // Match user
       // console.log(req.body.name);
       User.findOne({
-        name : req.body.name, 
         email: req.body.email,
-        nrp : req.body.nrp,
-        token : req.body.token
+        nrp : ('nrp' in req.body && req.body.nrp != "") ? req.body.nrp: "0",
+        token : req.body.token,
       }).then(user => {
         console.log(user);
+        console.log(req.body);
         if (!user) {
           return done(null, false, { message: 'Wrong credentials' });
         }

@@ -1,48 +1,47 @@
-const express = require('express');
-const expressLayouts = require('express-ejs-layouts');
-const mongoose = require('mongoose');
-const passport = require('passport');
+var createError = require('http-errors');
+var express = require('express');
+var expressLayouts = require('express-ejs-layouts');
+var path = require('path');
 const flash = require('connect-flash');
 const session = require('express-session');
-const path = require('path');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const bodyParser = require('body-parser');
 
-const app = express();
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
 
 // Passport Config
 require('./config/passport')(passport);
 
-// DB Config
+var app = express();
+
+app.use( bodyParser.json() );
+
 require('./db/mongoose');
-// const db = require('./config/keys').mongoURI;
 
-// Connect to MongoDB
-// mongoose
-//   .connect(
-//     db,
-//     { useNewUrlParser: true }
-//   )
-//   .then(() => console.log('MongoDB Connected'))
-//   .catch(err => console.log(err));
-
-// EJS
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
+
 app.use(express.json());
-
-// Express body parser
-app.use(express.urlencoded({ extended: true }));
-
-// Static
-app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Express session
-app.use(
-  session({
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: true
-  })
-);
+app.use(session({
+  secret: "our-passport-local-strategy-app",
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+      maxAge: 3600000
+  }
+}));
+
+new Promise((resolve, reject) => {
+  setTimeout(() => reject('woops'), 500);
+});
 
 // Passport middleware
 app.use(passport.initialize());
@@ -59,10 +58,23 @@ app.use(function(req, res, next) {
   next();
 });
 
-// Routes
-app.use('/', require('./routes/index.js'));
-app.use('/users', require('./routes/users.js'));
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
 
-const PORT = process.env.PORT || 5000;
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
 
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+module.exports = app;

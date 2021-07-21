@@ -1,147 +1,58 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
+var express = require('express');
+var router = express.Router();
 const passport = require('passport');
-const fetch = require('node-fetch');
-const EmailService = require('../emails/account');
-// Load User and Pilihan model
-const User = require('../models/User');
-const Pilihan = require('../models/Votee');
+const Pilihan = require('../models/Votees');
 const { forwardAuthenticated, ensureAuthenticated, ensureNotVoted, voterAuthenticated } = require('../config/auth');
 
-// Search nrp for validation
-function search(NRP, myArray){
-  for (var i=0; i < myArray.length; i++) {
-      if (myArray[i].NRP === NRP) {
-          return myArray[i];
-      }
-  }
-  return null
-}
+var app = express();
 
-// Random string generator
-const makeString = require('../js/randomString');
-
-// Login Page
-router.get('/login', forwardAuthenticated, (req, res) => res.render('login'));
-
-// Register
-router.post('/register', async (req, res) => {
-  // console.log(req.body);
-  const { name, email, nrp } = req.body;
-  let errors = [];
-
-  if (!name || !email || !nrp) {
-    errors.push({ msg: 'Please enter all fields' });
-  }
-
-  if (errors.length > 0) {
-    res.render('register', {
-      errors,
-      name,
-      email,
-      nrp
-    });
-  } else {
-    User.findOne({ email : email }).then(async user => {
-      if (user) {
-        errors.push({ msg: 'Sudah ada pengguna dengan email itu.' });
-        res.render('register', {
-          errors,
-          name,
-          email,
-          nrp
-        });
-      } else {
-        const nrp_data = await fetch('https://voting-maranatha.herokuapp.com/json_user/rahasia/banget/banget/banget/gelo/siah').then((res) => {return res.json()})
-        console.log(nrp_data)
-        const search_result = search(nrp, nrp_data)
-        console.log(search_result)
-        if (search_result) {
-          let token = makeString(10);
-
-          console.log(token);
-          const newUser = new User({
-            name,
-            email,
-            nrp,
-            token,
-            memilih : false
-          });
-
-          newUser
-            .save()
-            .then(user => {
-              req.flash(
-                'success_msg',
-                `Akan dikirim email ke ${email}. Tolong dicek (mungkin di spam) untuk mendapatkan token.`
-              );
-              EmailService.sendEmail(name, email, nrp, token);
-              res.redirect('/users/login');
-            })
-            .catch(err => console.log(err));
-        } else {
-          req.flash('error_msg', 'Anda bukan warga psikologi maranatha')
-          res.redirect('/')
-        }
-      }
-    });
-  }
-});
-
-// Login POST method
-router.post('/login', 
+router.post('/', 
   passport.authenticate('local', {
-    failureRedirect: '/users/login',
+    failureRedirect: '/#Vote',
     failureFlash : true
   }), (req, res) => {
-    if (req.user.name === 'admin') {
-      res.redirect('/dashboard');
-    }
-    if (req.user.isAdmin !== 'admin') {
-      res.redirect('/users/voting');
-    }
+    res.redirect('/');
   }
 );
 
 // Logout
 router.get('/logout', ensureAuthenticated, (req, res) => {
-  if (req.user.name !== 'admin') {
-    req.flash('success_msg', 'You have voted!');
-  }
   req.logout();
-  res.redirect('/users/login');
+  res.redirect('/');
 });
 
-// Voting Page
-router.get('/voting', ensureAuthenticated,  voterAuthenticated, (req, res) => {
-  res.render('vote');
-})
-
-// Voting POST
 router.post('/voting', ensureAuthenticated, ensureNotVoted, voterAuthenticated, async (req, res) => {
   try {
-    console.log(req.body);
-    console.log('ANJING');
-    console.log(typeof req.user._id);
     let username = req.user.name;
     const pilihan = await new Pilihan({
-      pilihan : req.body.product,
-      pemilih : req.user.name
+      pilihan : {
+        Mapeka: (req.body.MAPEKA != "") ? parseInt(req.body.MAPEKA, 10): 0,
+        Ukor: (req.body.UKOR != "") ? parseInt(req.body.UKOR, 10): 0,
+        Vom : (req.body.VOM != "") ? parseInt(req.body.VOM, 10): 0,
+        Menwa : (req.body.MENWA!= "") ? parseInt(req.body.MENWA, 10): 0,
+        Mcuc : (req.body.MCUC != "") ? parseInt(req.body.MCUC, 10): 0,
+        Bela : (req.body.Bela != "") ? parseInt(req.body.Bela, 10): 0,
+        Teto : (req.body.Teto != "") ? parseInt(req.body.Teto, 10): 0,
+        Seni : (req.body.UKS != "") ? parseInt(req.body.UKS, 10): 0,
+        Maphac : (req.body.MAPHAC != "") ? parseInt(req.body.MAPHAC, 10): 0
+    },
+      pemilih : req.user._id
     });
     await pilihan.save();
     await req.user.save();
 
-    req.logout();
-    res.render('done', {
+    res.render('finish', {
+      title: "Selesai • Universitas Kristen Maranatha",
       name : username
     });
   } catch (e) {
     console.log(e);
     res.render('vote', {
-      error : e
+      error : e,
+      title: "Vote • Universitas Kristen Maranatha"
     })
   }
-})
+});
+
 
 module.exports = router;
